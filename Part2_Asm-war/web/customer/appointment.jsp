@@ -199,46 +199,39 @@
     <%@ include file="includes/footer.jsp" %>
     <%@ include file="includes/scripts.jsp" %>
     
+    <!-- Pass JSP data to JavaScript -->
     <script>
-        // Override the loadAvailableDoctors function with JSP data
-        document.addEventListener('DOMContentLoaded', function() {
-            // Replace the loadAvailableDoctors function with JSP data
-            window.loadAvailableDoctors = function() {
-                const doctorsContainer = document.getElementById('doctor-cards-container');
-                if (doctorsContainer) {
-                    doctorsContainer.innerHTML = '<div class="text-center"><i class="fa fa-spinner fa-spin"></i> Loading available doctors...</div>';
-                    
-                    setTimeout(function() {
-                        doctorsContainer.innerHTML = '';
-                        
-                        // Create doctor cards from JSP data
-                        <%
-                        if (doctorList != null && !doctorList.isEmpty()) {
-                            for (Doctor doctor : doctorList) {
-                                String doctorName = doctor.getName();
-                                String specialization = doctor.getSpecialization();
-                                if (doctorName != null) {
-                                    doctorName = doctorName.replaceAll("'", "\\\\'");
-                                }
-                                if (specialization == null) {
-                                    specialization = "";
-                                } else {
-                                    specialization = specialization.replaceAll("'", "\\\\'");
-                                }
-                        %>
-                                createDoctorCard(<%= doctor.getId() %>, '<%= doctorName %>', '<%= specialization %>');
-                        <%
-                            }
-                        }
-                        %>
-                    }, 500);
+        // Pass doctor data from JSP to JavaScript
+        window.doctorData = [
+            <%
+            if (doctorList != null && !doctorList.isEmpty()) {
+                for (int i = 0; i < doctorList.size(); i++) {
+                    Doctor doctor = doctorList.get(i);
+                    String doctorName = doctor.getName();
+                    String specialization = doctor.getSpecialization();
+                    if (doctorName != null) {
+                        doctorName = doctorName.replaceAll("'", "\\\\'");
+                    }
+                    if (specialization == null) {
+                        specialization = "";
+                    } else {
+                        specialization = specialization.replaceAll("'", "\\\\'");
+                    }
+                    if (i > 0) out.print(",");
+            %>
+                {
+                    id: <%= doctor.getId() %>,
+                    name: '<%= doctorName %>',
+                    specialization: '<%= specialization %>'
                 }
-            };
-            
-            <% if (preSelectedTreatment != null) { %>
-                handlePreSelectedTreatment();
-            <% } %>
-        });
+            <%
+                }
+            }
+            %>
+        ];
+        
+        // Pass pre-selected treatment info
+        window.preSelectedTreatment = <%= preSelectedTreatment != null ? preSelectedTreatment : "null" %>;
     </script>
 
 </body>
